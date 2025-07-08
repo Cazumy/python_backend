@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: rolls
+      POSTGRES_USER: Homemem
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+asyncpg://Homemem:admin@db:5432/rolls
+    ports:
+      - "8000:8000"
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+  migrate:
+    build: ./backend
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://Homemem:admin@db:5432/rolls
+    depends_on:
+      - db
+    command: alembic upgrade head
+
+volumes:
+  postgres_data:
