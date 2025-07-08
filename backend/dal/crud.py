@@ -2,7 +2,6 @@ from dal.roll import Roll
 from api.schemas import RollCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, func
-from api.schemas import RollCreate
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -50,13 +49,13 @@ async def get_rolls_by_weight_range(session, min_weight: float, max_weight: floa
 
 async def get_rolls_count_in_period(session, date_from, date_to):
     try:
-        stmt = select(func.count()).where(
+        query = select(func.count()).where(
             and_(
-                or_(Roll.date_of_adding == None, Roll.date_of_adding <= date_to),
+                or_(Roll.date_of_adding <= date_to),
                 or_(Roll.date_of_removing == None, Roll.date_of_removing >= date_from)
             )
         )
-        result = await session.execute(stmt)
+        result = await session.execute(query)
         count = result.scalar()
         return count
     except SQLAlchemyError as e:
