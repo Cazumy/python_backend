@@ -39,7 +39,7 @@ async def get_rolls_by_weight_range(min_weight: float = Query(..., description="
             raise HTTPException(status_code=500, detail="Ошибка БД")
 
 @router.get("/date_stat_count/", response_model=int)
-async def get_rolls_count_in_period(date_from: date = Query(..., description="Начало периода"),date_to: date = Query(description="Конец периода")):
+async def get_rolls_count_in_period(date_from: date = Query(..., description="Начало периода"),date_to: date = Query(None, description="Конец периода")):
     async with async_session() as session:
         try:
             count = await crud.get_rolls_count_in_period(session, date_from, date_to)
